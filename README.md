@@ -91,7 +91,15 @@ These requirements presume that you can run the game at it's original 1120x632 r
 4) Run the executable and you will be guided through the installation process. You will be asked to provide the files you acquired in the previous step. When presented with options for how to do this:
 
     - **Add Files** will only allow you to provide **containers or images dumped from an Xbox 360**. These often come in the form of very large files without associated extensions. Don't worry if you're not aware of what's inside of them, the installer will automatically detect what type of content is inside the container.
-    - Folder Support is unavailable at the moment, but will be looked into post-release.
+    - **Extracted Folder** lets you select the root of an already extracted Xbox 360 disc.
+      Select the folder directly containing `Default.xex` and `Data/GameLogic.dll`;
+      the installer copies its game files into the new installation and skips `$SystemUpdate`.
+      The original folder is read only. The Title Update package is still required,
+      and DLC is still optional. This option accepts an extracted disc tree,
+      not a GoD container or a PC port's modified data folder.
+
+      The same folder can be supplied through `--eot_install_disc="/path/to/extracted/game"`.
+      Select the Title Update package separately, or supply `--eot_install_update` as usual.
 
 > [!NOTE]
 > Please note that it is **not possible** to complete the installation if your files have been **modified**. In case of other problems such as black screens or crashes, **do not try to reinstall the game** as it is not possible for the process to result in an invalid installation.

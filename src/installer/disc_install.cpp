@@ -18,6 +18,7 @@
 
 #include "core/logging.h"
 #include "installer/dlc_publish.h"
+#include "installer/extracted_disc.h"
 
 namespace eot::installer {
 
@@ -163,18 +164,29 @@ std::thread Installer::RunAsync(const InstallSources &sources, const fs::path &g
 
     std::unique_ptr<rex::filesystem::DiscImageDevice> disc;
     Entry *root = nullptr;
+    std::vector<ExtractedDiscFile> folder_files;
     if (!sources.disc.empty()) {
-      disc = OpenDiscImage(sources.disc);
-      if (!disc) {
-        Fail(progress, "Failed to open the disc image.");
-        finish();
-        return;
-      }
-      root = disc->ResolvePath("");
-      if (!root) {
-        Fail(progress, "The disc image has no root directory.");
-        finish();
-        return;
+      std::error_code source_ec;
+      if (fs::is_directory(sources.disc, source_ec)) {
+        const std::string error = CollectExtractedDiscFiles(sources.disc, game_data_dest, folder_files);
+        if (!error.empty()) {
+          Fail(progress, error);
+          finish();
+          return;
+        }
+      } else {
+        disc = OpenDiscImage(sources.disc);
+        if (!disc) {
+          Fail(progress, "Failed to open the disc image.");
+          finish();
+          return;
+        }
+        root = disc->ResolvePath("");
+        if (!root) {
+          Fail(progress, "The disc image has no root directory.");
+          finish();
+          return;
+        }
       }
     }
 
@@ -214,6 +226,8 @@ std::thread Installer::RunAsync(const InstallSources &sources, const fs::path &g
         continue;
       add(rel, entry, {}, entry->size());
     }
+    for (const ExtractedDiscFile& file : folder_files)
+      add(file.relative_path.generic_string(), nullptr, file.host_path, file.size);
 
     std::unique_ptr<StfsContainerDevice> update;
     if (!sources.update.empty()) {
@@ -249,6 +263,21 @@ std::thread Installer::RunAsync(const InstallSources &sources, const fs::path &g
       const fs::path dlc_dir = game_data_dest.parent_path() / kDlcFolderName;
       add_to(std::string(kDlcFolderName) + "/" + package.filename().string(), dlc_dir / package.filename(),
              nullptr, package, size);
+    }
+
+    // Title-update/DLC outputs are not necessarily in the extracted disc's
+    // inventory. Check the complete plan before creating or replacing files.
+    if (!folder_files.empty()) {
+      for (const auto& item : plan) {
+        if (!item.needs_copy)
+          continue;
+        const std::string error = ValidateExtractedDiscDestination(sources.disc, item.dest);
+        if (!error.empty()) {
+          Fail(progress, error);
+          finish();
+          return;
+        }
+      }
     }
 
     progress.files_total.store(plan.size());

@@ -59,6 +59,7 @@ private:
   void DrawDone();
 
   void PickDisc();
+  void PickExtractedFolder();
   void PickUpdate();
   void PickDlc();
   void PickInstallDir();
