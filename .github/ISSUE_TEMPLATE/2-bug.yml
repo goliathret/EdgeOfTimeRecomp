@@ -1,0 +1,69 @@
+name: Bug
+description: Something doesn't work or look the way it should.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A log is required. Each run writes a new `reeot_NNN.log` (the highest number is the newest; the last 10 are kept):
+        - **Windows:** the `logs` folder next to `EdgeOfTimeRecomp.exe`
+        - **macOS:** `~/Library/Logs/reeot/`
+        - **Linux (AppImage):** `~/.local/state/reeot/logs/`
+        - **Linux (other builds):** the `logs` folder next to the executable
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: In the window title and the first line of the log.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux (AppImage)
+        - Linux (other)
+        - Steam Deck
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: GPU and CPU
+      placeholder: "RTX 3060, Ryzen 5 5600X"
+  - type: textarea
+    id: description
+    attributes:
+      label: What's wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Options > Video
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen instead?
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: Drag the `reeot_NNN.log` file from the run where it happened into this box.
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or video
+      description: Especially for graphics bugs, a side-by-side with the console helps.

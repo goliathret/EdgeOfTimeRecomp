@@ -1,0 +1,24 @@
+name: Suggestion
+description: A change to something that already exists, like a default, wording, layout or control.
+title: "[Suggestion]: "
+labels: ["suggestion"]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where?
+      placeholder: "Options > Graphics, the installer, button prompts, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What would you change?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+    validations:
+      required: true

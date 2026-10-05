@@ -1,0 +1,28 @@
+name: Feature request
+description: Something new the port should do.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: What would you like added?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: What it would let you do, or what problem it solves.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How could it work?
+      description: Where it would live (an option, a key, a menu) and how it would behave.
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Other ports or mods that do this, screenshots, links.

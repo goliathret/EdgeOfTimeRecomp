@@ -1,0 +1,105 @@
+name: Severe bug
+description: A crash, a freeze, a lost save, or anything that stops you from playing.
+title: "[Severe]: "
+labels: ["bug", "severe"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A log is required. Each run writes a new `reeot_NNN.log` (the highest number is the newest; the last 10 are kept):
+        - **Windows:** the `logs` folder next to `EdgeOfTimeRecomp.exe`
+        - **macOS:** `~/Library/Logs/reeot/`
+        - **Linux (AppImage):** `~/.local/state/reeot/logs/`
+        - **Linux (other builds):** the `logs` folder next to the executable
+
+        If you started the game again after the crash, attach the log from the run that crashed, not the newest one.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What happened?
+      options:
+        - Crash to desktop
+        - Freeze or hang
+        - Lost or corrupted save
+        - Stuck, can't progress
+        - Won't start, or the installer fails
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: In the window title and the first line of the log.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux (AppImage)
+        - Linux (other)
+        - Steam Deck
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: GPU and CPU
+      placeholder: "RTX 3060, Ryzen 5 5600X"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe it
+      description: Where you were in the game and what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Load chapter ...
+        2. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often?
+      options:
+        - Every time
+        - Sometimes
+        - Only once so far
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error message
+      description: If an error window came up, paste its text here.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: Drag the `reeot_NNN.log` file from the run where it happened into this box.
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or video
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit
+      options:
+        - label: I attached the log from the run where it happened.
+          required: true
