@@ -10,7 +10,7 @@
 
 REXCVAR_DEFINE_BOOL(eot_sd_suits, false, "EdgeOfTime/Config", "Unlock Shattered Dimensions suits");
 
-REXCVAR_DEFINE_STRING(eot_sd_code, "shatmypants", "EdgeOfTime/Config", "Shattered Dimensions unlock code");
+REXCVAR_DEFINE_STRING(eot_sd_code, "excelsior", "EdgeOfTime/Config", "Shattered Dimensions unlock code");
 
 REX_EXTERN(__imp__eot_HUDStartScreen_EnterSDCheck); // (this r3)
 REX_EXTERN(__imp__eot_SaveGame_ApplyLoadedData);    // (this r3, result r4)
