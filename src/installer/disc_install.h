@@ -92,6 +92,7 @@ std::string CheckUpdatePackage(const PackageInfo &info);
 std::string CheckDlcPackage(const PackageInfo &info);
 
 struct InstallSources {
+  // Either an Xbox 360 disc image or its already extracted game root.
   std::filesystem::path disc;
   std::filesystem::path update;
   std::vector<std::filesystem::path> dlc;

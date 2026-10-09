@@ -23,12 +23,13 @@
 #include "core/encoding.h"
 #include "core/logging.h"
 #include "embedded.h"
+#include "installer/extracted_disc.h"
 #include "installer/self_install.h"
 #include "platform/file_dialog.h"
 #include "platform/process.h"
 #include "ui/theme.h"
 
-REXCVAR_DEFINE_STRING(eot_install_disc, "", "EdgeOfTime/Config", "Disc image to install");
+REXCVAR_DEFINE_STRING(eot_install_disc, "", "EdgeOfTime/Config", "Disc image or extracted game folder to install");
 REXCVAR_DEFINE_STRING(eot_install_update, "", "EdgeOfTime/Config", "Title update to install");
 REXCVAR_DEFINE_STRING(eot_install_dlc, "", "EdgeOfTime/Config", "DLC packages to install");
 REXCVAR_DEFINE_STRING(eot_install_dir, "", "EdgeOfTime/Config", "Folder to install into");
@@ -45,7 +46,7 @@ constexpr const char *kTitleMain = "reeot - Installer";
 constexpr const char *kTitleRepair = "reeot - Repair";
 constexpr const char *kRepairNotice =
     "Existing install found. Continue keeps it as it is and adds any packages listed; Repair takes the disc "
-    "image and the title update again and copies back only what is missing.";
+    "image or extracted game folder and the title update again and copies back only what is missing.";
 constexpr const char *kSpaceHint = "(~6 GB required)";
 
 constexpr const char *kSuggestedVsync = "false";
@@ -370,6 +371,16 @@ void InstallerWizard::ValidateDisc() {
     disc_status_.clear();
     return;
   }
+  std::error_code ec;
+  if (std::filesystem::is_directory(disc_path_, ec)) {
+    disc_status_ = ValidateExtractedDisc(disc_path_);
+    if (!disc_status_.empty())
+      return;
+    disc_fingerprint_ = ExtractedDiscFingerprint(disc_path_);
+    disc_valid_ = !disc_fingerprint_.empty();
+    disc_status_ = disc_valid_ ? "Valid extracted folder" : "Could not read the extracted game folder";
+    return;
+  }
   auto disc = OpenDiscImage(disc_path_);
   if (!disc) {
     disc_status_ = "Could not read as Xbox 360 disc image";
@@ -429,6 +440,14 @@ void InstallerWizard::PickDisc() {
       {L"All files", L"*.*"},
   };
   auto picked = platform::ShowOpenFileDialog(L"Select Xbox 360 Disc Image", kFilters);
+  if (!picked)
+    return;
+  disc_path_ = *picked;
+  ValidateDisc();
+}
+
+void InstallerWizard::PickExtractedFolder() {
+  auto picked = platform::ShowOpenFolderDialog(L"Select Extracted Game Folder");
   if (!picked)
     return;
   disc_path_ = *picked;
@@ -649,8 +668,17 @@ void InstallerWizard::DrawSources() {
   ImGui::TableSetupColumn("##path", ImGuiTableColumnFlags_WidthStretch);
   ImGui::TableSetupColumn("##status", ImGuiTableColumnFlags_WidthFixed, 260.0f);
 
-  SourceRow("disc", "Disc Image...", disc_path_, "not selected", disc_valid_, disc_status_,
+  std::error_code ec;
+  const bool extracted_folder = std::filesystem::is_directory(disc_path_, ec);
+  const std::filesystem::path unselected;
+  SourceRow("disc", "Disc Image...", extracted_folder ? unselected : disc_path_,
+            "or select an extracted folder", !extracted_folder && disc_valid_,
+            extracted_folder ? "" : disc_status_,
             [this]() { PickDisc(); });
+  SourceRow("disc_folder", "Extracted Folder...", extracted_folder ? disc_path_ : unselected,
+            "or select a disc image", extracted_folder && disc_valid_,
+            extracted_folder ? disc_status_ : "",
+            [this]() { PickExtractedFolder(); });
   SourceRow("update", "Title Update...", update_path_, "required", update_valid_, update_status_,
             [this]() { PickUpdate(); });
 
